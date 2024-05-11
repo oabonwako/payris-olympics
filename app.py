@@ -5,7 +5,7 @@ from dash import Dash, html, dash_table, dcc, callback, Output, Input
 
 # Initialize the app
 app = dash.Dash(__name__,use_pages=True)
-
+server = app.server
 # App layout
 app.layout = html.Div([
     html.Div(children='2024 Payris FunOlympic Games analysis tool', style={'fontSize':50, 'textAlign':'center'}),
