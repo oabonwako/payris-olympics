@@ -4,7 +4,7 @@ from dash import Dash, html, dash_table, dcc, callback, Output, Input
 
 
 # Initialize the app
-app = dash.Dash(__name__,use_pages=True)
+app = dash.Dash(__name__,suppress_callback_exceptions=True,use_pages=True)
 server = app.server
 # App layout
 app.layout = html.Div([
