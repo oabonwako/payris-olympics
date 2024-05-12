@@ -33,7 +33,7 @@ epl_standings = epl[['Rank', 'TeamId', 'Name', 'ShortName',
 
 # App layout
 layout = html.Div([
-    html.Div(children='Football API Integration'),
+    html.Div(children='Football data API Integration'),
     html.Hr(),
     dash_table.DataTable(data=epl_standings.to_dict('records'), page_size=10),
     html.Br(),

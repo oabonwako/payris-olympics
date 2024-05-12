@@ -38,7 +38,7 @@ nba_grp = nba.groupby(['player_name','team','season'],as_index=False).sum().sort
 
 # App layout
 layout = html.Div([
-    html.Div(children='Baseball API intergration'),
+    html.Div(children='Baseball data API intergration'),
     html.Hr(),
     dash_table.DataTable(data=nba_grp.to_dict('records'), page_size=6),
     html.Br(),
@@ -87,10 +87,10 @@ layout = html.Div([
     prevent_initial_call=True,
 )
 def update_graph(x_col_chosen,y_col_chosen, cl_col_chosen,y2_col_chosen):
-    fig1 = px.scatter(nba_grp, x=x_col_chosen, y=y_col_chosen, color=cl_col_chosen)
-    fig2 = px.bar(nba_grp, x='team', y=y2_col_chosen, height=450,width=450)
-    fig3 = px.histogram(nba_grp, x='age', y=y2_col_chosen, height=450,width=450)
-    fig4 = px.bar(nba_grp, x='season', y=y2_col_chosen, height=450,width=450)
+    fig1 = px.scatter(nba_grp, x=x_col_chosen, y=y_col_chosen, color=cl_col_chosen, title=f"Relationship between {x_col_chosen} and {y_col_chosen} by {cl_col_chosen}")
+    fig2 = px.bar(nba_grp, x='team', y=y2_col_chosen, height=450,width=450, title=f"Bar chart of each team and their {y2_col_chosen}")
+    fig3 = px.histogram(nba_grp, x='age', y=y2_col_chosen, height=450,width=450, title=f"Histogram of age and {y2_col_chosen}")
+    fig4 = px.bar(nba_grp, x='season', y=y2_col_chosen, height=450,width=450, title=f"Bar chart of the total{y2_col_chosen} for each")
     return fig1, fig2, fig3, fig4
 
 

@@ -31,11 +31,12 @@ new_data = gold
 
 # App layout
 layout = html.Div([
-    html.Div(children='Data analysis of the Olympic games, Graph, and Controls'),
+    html.Div(children='Data analysis of the athletes that won medals in each sport event.'),
     html.Hr(),
-    dcc.Dropdown(['Bronze_Medal_Count','Silver_Medal_Count','Gold_Medal_Count'], 'Bronze_Medal_Count', id='dropdown-item'),
     dash_table.DataTable(data=new_data.to_dict('records'), page_size=6),
     html.Br(),
+    html.Div(['change y-axis',
+              dcc.Dropdown(['Bronze_Medal_Count','Silver_Medal_Count','Gold_Medal_Count'], 'Bronze_Medal_Count', id='dropdown-item'),]),
     html.Br(),
     html.Div([dcc.Graph(figure={}, id='olympic-bar-graph1'), dcc.Graph(figure={}, id='olympic-bar-graph2')], style={"display":"flex"}),
 ])
