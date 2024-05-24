@@ -4,7 +4,6 @@ from datetime import datetime
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import numpy as np
 
 #add link
@@ -16,11 +15,7 @@ test_data = pd.read_csv('websitelog.csv')
 #2. Data Transformation
 first = test_data.columns
 columns = ['ip_address','datetime','HTTPResponse','last_status_code',
-<<<<<<< HEAD
                 'sports_event','interaction_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)','Latitude','Longitude','country_of_origin','continent','traffic_source',
-=======
-                'sports_event','interaction_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)','country','traffic_source',
->>>>>>> 98950e5ba8cf93d77f58fb056602cf23b4bf8a60
                 'device_type','browser_type','response_time','content_size']
 test_data.columns = columns
 test_data.loc[len(test_data.index)] = first
@@ -32,19 +27,12 @@ test_data[['Ad_Revenue($)']] = test_data[['Ad_Revenue($)']].astype('int64')
 test_data[['session_duration(mins)']] = test_data[['session_duration(mins)']].astype('int64')
 
 #2.2 grouping data
-<<<<<<< HEAD
-test_grp = test_data[['datetime','Latitude','Longitude','country_of_origin','continent','interaction_type','traffic_source','device_type','browser_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime','interaction_type','traffic_source','device_type','browser_type'],as_index=False).sum()
+test_grp = test_data[['datetime','interaction_type','traffic_source','device_type','browser_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime','interaction_type','traffic_source','device_type','browser_type'],as_index=False).sum()
 test_grp1 = test_data[['datetime','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime'],as_index=False).sum()
 test_grp2 = test_data[['datetime','interaction_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime','interaction_type'],as_index=False).sum()
 test_grp3 = test_data[['Latitude','Longitude','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['Latitude','Longitude',],as_index=False).sum()
 test_grp4 = test_data[['country_of_origin','Latitude','Longitude','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['country_of_origin','Latitude','Longitude',],as_index=False).sum()
 test_grp5 = test_data[['continent','Latitude','Longitude','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['continent','Latitude','Longitude'],as_index=False).sum()
-=======
-test_grp = test_data[['datetime','interaction_type','traffic_source','device_type','browser_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime','interaction_type','traffic_source','device_type','browser_type'],as_index=False).sum()
-test_grp1 = test_data[['datetime','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime'],as_index=False).sum()
-test_grp2 = test_data[['datetime','interaction_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime','interaction_type'],as_index=False).sum()
-
->>>>>>> 98950e5ba8cf93d77f58fb056602cf23b4bf8a60
 
 #3 Initialize line figure
 fig = go.Figure()
@@ -161,7 +149,10 @@ fig.update_layout(
 )
 
 
-################################# Number of visits #############################
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+
 # frequency of Country
 freq = test_grp4
 freq = test_grp4.country_of_origin.value_counts().reset_index().rename(columns={"index": "x"})
@@ -227,6 +218,7 @@ fig3.update_layout(
             y=0)
     ]
 )
+
 
 
 # Initialize the app
