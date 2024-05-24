@@ -4,6 +4,7 @@ from datetime import datetime
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import numpy as np
 
 #add link
@@ -15,7 +16,7 @@ test_data = pd.read_csv('websitelog.csv')
 #2. Data Transformation
 first = test_data.columns
 columns = ['ip_address','datetime','HTTPResponse','last_status_code',
-                'sports_event','interaction_type','view_duration(mins)','Ad_Revenue','session_duration(mins)','country','traffic_source',
+                'sports_event','interaction_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)','Latitude','Longitude','country_of_origin','continent','traffic_source',
                 'device_type','browser_type','response_time','content_size']
 test_data.columns = columns
 test_data.loc[len(test_data.index)] = first
@@ -23,14 +24,16 @@ test_data = test_data.sort_values(by='datetime')
 
 #2.1 Change data types
 test_data[['view_duration(mins)']] = test_data[['view_duration(mins)']].astype('int64')
-test_data[['Ad_Revenue']] = test_data[['Ad_Revenue']].astype('int64')
+test_data[['Ad_Revenue($)']] = test_data[['Ad_Revenue($)']].astype('int64')
 test_data[['session_duration(mins)']] = test_data[['session_duration(mins)']].astype('int64')
 
 #2.2 grouping data
-test_grp = test_data[['datetime','interaction_type','traffic_source','device_type','browser_type','view_duration(mins)','Ad_Revenue','session_duration(mins)']].groupby(['datetime','interaction_type','traffic_source','device_type','browser_type'],as_index=False).sum()
-test_grp1 = test_data[['datetime','view_duration(mins)','Ad_Revenue','session_duration(mins)']].groupby(['datetime'],as_index=False).sum()
-test_grp2 = test_data[['datetime','interaction_type','view_duration(mins)','Ad_Revenue','session_duration(mins)']].groupby(['datetime','interaction_type'],as_index=False).sum()
-
+test_grp = test_data[['datetime','Latitude','Longitude','country_of_origin','continent','interaction_type','traffic_source','device_type','browser_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime','interaction_type','traffic_source','device_type','browser_type'],as_index=False).sum()
+test_grp1 = test_data[['datetime','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime'],as_index=False).sum()
+test_grp2 = test_data[['datetime','interaction_type','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['datetime','interaction_type'],as_index=False).sum()
+test_grp3 = test_data[['Latitude','Longitude','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['Latitude','Longitude',],as_index=False).sum()
+test_grp4 = test_data[['country_of_origin','Latitude','Longitude','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['country_of_origin','Latitude','Longitude',],as_index=False).sum()
+test_grp5 = test_data[['continent','Latitude','Longitude','view_duration(mins)','Ad_Revenue($)','session_duration(mins)']].groupby(['continent','Latitude','Longitude'],as_index=False).sum()
 
 #3 Initialize line figure
 fig = go.Figure()
@@ -39,13 +42,13 @@ fig = go.Figure()
 
 fig.add_trace(
     go.Scatter(x=list(test_grp1.datetime),
-               y=list(test_grp1.Ad_Revenue),
+               y=list(test_grp1['Ad_Revenue($)']),
                name="Ad_Revenue",
                line=dict(color="#33CFA5")))
 
 fig.add_trace(
     go.Scatter(x=list(test_grp1.datetime),
-               y=[test_grp1.Ad_Revenue.mean()] * len(test_grp1.index),
+               y=[test_grp1['Ad_Revenue($)'].mean()] * len(test_grp1.index),
                name="Ad_Revenue Average",
                visible=False,
                line=dict(color="#33CFA5", dash="dash")))
@@ -65,21 +68,21 @@ fig.add_trace(
 
 # Add Annotations and Buttons
 high_annotations = [dict(x="2018-03-01",
-                         y=test_grp1.Ad_Revenue.mean(),
+                         y=test_grp1['Ad_Revenue($)'].mean(),
                          xref="x", yref="y",
-                         text="Ad_Revenue Average:<br> %.3f" % test_grp1.Ad_Revenue.mean(),
+                         text="Ad_Revenue Average:<br> %.3f" % test_grp1['Ad_Revenue($)'].mean(),
                          ax=0, ay=-40),
-                    dict(x=test_grp1.datetime[test_grp1.Ad_Revenue.idxmax()],
-                         y=test_grp1.Ad_Revenue.max(),
+                    dict(x=test_grp1.datetime[test_grp1['Ad_Revenue($)'].idxmax()],
+                         y=test_grp1['Ad_Revenue($)'].max(),
                          xref="x", yref="y",
-                         text="Ad_Revenue Max:<br> %.3f" % test_grp1.Ad_Revenue.max(),
+                         text="Ad_Revenue Max:<br> %.3f" % test_grp1['Ad_Revenue($)'].max(),
                          ax=-40, ay=-40)]
 low_annotations = [dict(x="2018-10-01",
                         y=test_grp1['view_duration(mins)'].mean(),
                         xref="x", yref="y",
                         text="view_duration Average:<br> %.3f" % test_grp1['view_duration(mins)'].mean(),
                         ax=0, ay=40),
-                   dict(x=test_grp1.datetime[test_grp1.Ad_Revenue.idxmin()],
+                   dict(x=test_grp1.datetime[test_grp1['Ad_Revenue($)'].idxmin()],
                         y=test_grp1['view_duration(mins)'].min(),
                         xref="x", yref="y",
                         text="view_duration Min:<br> %.3f" % test_grp1['view_duration(mins)'].min(),
@@ -93,12 +96,12 @@ fig.update_layout(
                 dict(label="None",
                      method="update",
                      args=[{"visible": [True, False, True, False]},
-                           {"title": "Ad Revenue and View duration of streams by date",
+                           {"title": "Ad Revenue($) and View duration of streams by date",
                             "annotations": []}]),
                 dict(label="Ad_Revenue",
                      method="update",
                      args=[{"visible": [True, True, False, False]},
-                           {"title": "Ad Revenue from streams by date",
+                           {"title": "Ad Revenue($) from streams by date",
                             "annotations": high_annotations}]),
                 dict(label="view_duration(mins)",
                      method="update",
@@ -108,7 +111,7 @@ fig.update_layout(
                 dict(label="Both",
                      method="update",
                      args=[{"visible": [True, True, True, True]},
-                           {"title": "Ad Revenue and View duration of streams by date, including average",
+                           {"title": "Ad Revenue($) and View duration of streams by date, including average",
                             "annotations": high_annotations + low_annotations}]),
             ]),
         )
@@ -116,7 +119,7 @@ fig.update_layout(
 
 # Set title and date range buttons
 fig.update_layout(
-    title_text="Ad Revenue and View duration of streams",
+    title_text="Ad Revenue($) and View duration of streams",
     xaxis=dict(
         rangeselector=dict(
             buttons=list([
@@ -147,6 +150,74 @@ fig.update_layout(
 )
 
 
+################################# Number of visits #############################
+# frequency of Country
+freq = test_grp4
+freq = test_grp4.country_of_origin.value_counts().reset_index().rename(columns={"index": "x"})
+
+fre2 = test_grp5
+freq2 = test_grp5.continent.value_counts().reset_index().rename(columns={"index": "x"})
+
+
+data = test_grp3.sample(1000)
+# Initialize figure with subplots
+fig3 = make_subplots(
+    rows=2, cols=2,
+    column_widths=[0.6, 0.4],
+    row_heights=[0.4, 0.6],
+    specs=[[{"type": "scattergeo", "rowspan": 2}, {"type": "bar"}],
+           [            None                    , {"type": "bar"}]])
+
+# Add scattergeo globe map of volcano locations
+fig3.add_trace(
+    go.Scattergeo(lat=data["Latitude"],
+                  lon=data["Longitude"],
+                  mode="markers",
+                  hoverinfo="text",
+                  showlegend=False,
+                  marker=dict(color="crimson", size=4, opacity=0.8)),
+    row=1, col=1
+)
+
+# Add locations bar chart
+fig3.add_trace(
+    go.Bar(x=freq2["continent"][0:10],y=freq2["count"][0:10], marker=dict(color="crimson"), showlegend=False),
+    row=1, col=2
+)
+
+# Add locations bar chart
+fig3.add_trace(
+    go.Bar(x=freq["country_of_origin"][0:10],y=freq["count"][0:10], marker=dict(color="crimson"),showlegend=False),
+    row=2, col=2
+)
+
+# Update geo subplot properties
+fig3.update_geos(
+    projection_type="orthographic",
+    landcolor="white",
+    oceancolor="MidnightBlue",
+    showocean=True,
+    lakecolor="LightBlue",
+)
+
+# Rotate x-axis labels
+fig3.update_xaxes(tickangle=45)
+
+# Set theme, margin, and annotation in layout
+fig3.update_layout(
+    margin=dict(r=10, t=25, b=40, l=60),
+    title_text='Total count of visits for each country of origin and continent',
+    annotations=[
+        dict(
+            showarrow=False,
+            xref="paper",
+            yref="paper",
+            x=0,
+            y=0)
+    ]
+)
+
+
 # Initialize the app
 #app = Dash(__name__)
 
@@ -160,8 +231,11 @@ layout = html.Div([
     html.Div([dcc.Graph(figure=fig)]),
     html.Br(),
     html.Br(),
+    html.Div([dcc.Graph(figure=fig3)]),
+    html.Br(),
+    html.Br(),
     html.Div(children='yaxis Controls for line and pie'),
-    dcc.Dropdown(['view_duration(mins)','Ad_Revenue','session_duration(mins)'],'view_duration(mins)', id='line-and-pie-dropdown-menu'),
+    dcc.Dropdown(['view_duration(mins)','Ad_Revenue($)','session_duration(mins)'],'view_duration(mins)', id='line-and-pie-dropdown-menu'),
     html.Br(),
     html.Br(),
     html.Div(children='xaxis Controls for pie'),
